@@ -13,7 +13,7 @@ def fillString(stru, newLen):
 
 class Schedule(BaseClass):
     enteringNewEvent = False
-    url = "https://calendar.google.com/calendar/ical/299foqe7gk7hfqthbruaj757go%40group.calendar.google.com/private-b568302beb19171e063d115f53a55fcf/basic.ics"
+    url = ""
     start = datetime.now() - timedelta(days=1)
     deltaTime = timedelta(days=7)
     end = start + deltaTime
