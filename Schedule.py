@@ -3,7 +3,8 @@ import unittest
 from icalevents import icalevents
 from datetime import date, timedelta, datetime,tzinfo, timezone
 import TimeConversions
-
+#This one bellow is only for a single string. Will be adding a proper config file later
+import GoogleScheduleAddress
 
 def fillString(stru, newLen):
     for i in range(len(stru), newLen):
@@ -13,7 +14,8 @@ def fillString(stru, newLen):
 
 class Schedule(BaseClass):
     enteringNewEvent = False
-    url = "https://calendar.google.com/calendar/ical/299foqe7gk7hfqthbruaj757go%40group.calendar.google.com/private-b568302beb19171e063d115f53a55fcf/basic.ics"
+    #change GoogleScheduleAddress.GoogleAdressString to the public link for your google calendar's .ics file
+    url = GoogleScheduleAddress.GoogleAdressString
     start = datetime.now() - timedelta(days=1)
     deltaTime = timedelta(days=7)
     end = start + deltaTime

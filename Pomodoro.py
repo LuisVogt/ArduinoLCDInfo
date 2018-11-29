@@ -5,8 +5,8 @@ import TimeConversions
 
 class Pomodoro(BaseClass):
     startTime = 0
-    pomodoroTime = 1500
-    restTime = 300
+    pomodoroTime = 15#00
+    restTime = 30#0
     currentPomodoro = 0
     currentRest = 0
     running = False
@@ -60,7 +60,7 @@ class Pomodoro(BaseClass):
         else:
             tempInt = (self.currentRest/self.restTime)*100
             self.countdownBar(int(tempInt), 1)
-            tempString = TimeConversions.convertIntTimeToString(self.currentPomodoro)#str(int(self.currentRest//60)) + ":" + str(int(self.currentRest % 60))
+            tempString = TimeConversions.convertIntTimeToString(self.currentRest)#str(int(self.currentRest//60)) + ":" + str(int(self.currentRest % 60))
         return tempString
 
     def update(self,input):
