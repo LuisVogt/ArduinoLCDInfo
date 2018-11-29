@@ -5,8 +5,8 @@ import TimeConversions
 
 class Pomodoro(BaseClass):
     startTime = 0
-    pomodoroTime = 15#00
-    restTime = 30#0
+    pomodoroTime = 1500
+    restTime = 300
     currentPomodoro = 0
     currentRest = 0
     running = False
