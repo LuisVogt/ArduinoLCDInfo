@@ -1,9 +1,9 @@
 from BaseClass import BaseClass
 import time
-
+from Schedule import Schedule
 
 class Clock(BaseClass):
-
+    scheduler = None
     def update(self, input):
         timeVariable = time.localtime()
         diaSemana = timeVariable.tm_wday
@@ -42,5 +42,10 @@ class Clock(BaseClass):
             diaSemana = "Sab"
         elif diaSemana == 6:
             diaSemana = "Dom"
-
+        #print(self.scheduler.getCurrentEventColor())
+        self.changeLED2(self.scheduler.getCurrentEventColor())
         self.updateOut(diaSemana + "   " + diazero + str(dia) + "/" + meszero + str(mes) + "/" + str(timeVariable.tm_year), "    " + horazero + str(hora) + ":" + minutozero + str(minuto) + ":" + segundozero + str(segundo),"","")
+
+    def __init__(self,scheduler):
+
+        self.scheduler = scheduler

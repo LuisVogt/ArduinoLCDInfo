@@ -29,8 +29,11 @@ Arduino = serial.Serial('COM3', 115200)
 Arduino.timeout = 1
 end = False
 
-AppList = [Clock(), Schedule(), Pomodoro()]
-active = 1
+AppList = []
+AppList.append(Schedule())
+AppList.append(Pomodoro())
+AppList.append(Clock(AppList[0]))
+active = 0
 AppList[active].swapIn()
 
 startTime = 0
@@ -74,7 +77,7 @@ while not end:
     elif previousCount == 0:
         Arduino.write(previousString.encode('latin-1'))
         previousCount -= 1
-    Arduino.write(outString.encode('latin-1'))
+    Arduino.write(outString)
 
 
 

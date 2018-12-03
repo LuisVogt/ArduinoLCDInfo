@@ -11,37 +11,58 @@ class chars(Enum):
 class BaseClass:
     lcdColumnSize = None
     lcdLineSize = None
-    out = "".encode('latin-1')
-    string1 = "".encode('latin-1')
-    string2 = "".encode('latin-1')
-    string3 = "".encode('latin-1')
-    string4 = "".encode('latin-1')
-    tempString1 = "".encode('latin-1')
-    tempString2 = "".encode('latin-1')
-    tempString3 = "".encode('latin-1')
-    tempString4 = "".encode('latin-1')
+
+    out = bytearray()
+    string1 = ""
+    string2 = ""
+    string3 = ""
+    string4 = ""
+
     buttonInput = None
     active = False
 
+    usingLed1 = False
+    usingLed2 = False
+    usingBuzzer = False
+    usingBar = False
+
     def countdownBar(self,percentage, character):
-        temp = "".encode('latin-1')
-        temp = "%" + chr(percentage) + chr(character)
-        self.out += temp
+        if not self.usingBar:
+            self.usingBar = True
+
+            temp = "".encode("latin-1")
+            temp = chr(ord("%")) + chr(percentage) + chr(character)
+
+            self.out += bytearray(temp,"latin-1")
 
     def redAlert(self, numberOfPulses):
-        temp = "".encode('latin-1')
-        temp = "!" + chr(numberOfPulses)
-        self.out += temp
+        if not self.usingLed1:
+            self.usingLed1 = True
+            temp = "".encode("latin-1")
+            temp = chr(ord("!")) + chr(numberOfPulses)
+            self.out += bytearray(temp,"latin-1")
 
     def changeLED(self, r, g, b):
-        temp = "".encode('latin-1')
-        temp = "*" + chr(r) + chr(g) + chr(b)
-        self.out += temp
+        if not self.usingLed2:
+            self.usingLed2 = True
+            temp = "".encode("latin-1")
+            temp = chr(ord('*')) + chr(r) + chr(g) +chr(b)
+
+            self.out += bytearray(temp,"latin-1")
+
+    def changeLED2(self,color):
+        if not self.usingLed2:
+            self.usingLed2 = True
+            temp = "".encode("latin-1")
+            temp = chr(ord("*")) + color
+            self.out += bytearray(temp,"latin-1")
 
     def buzzer(self, time):
-        temp = "".encode('latin-1')
-        temp = "@" + chr(time)
-        self.out += temp
+        if not self.usingBuzzer:
+            self.usingBuzzer = True
+            temp = "".encode("latin-1")
+            temp = chr(ord("@")) + chr(time)
+            self.out += bytearray(temp,"latin-1")
 
     def update(self,input):
         return
@@ -60,13 +81,22 @@ class BaseClass:
 
     def getString(self):
         tempString = "".encode('latin-1')
-        tempString = self.out + "$" + self.string1 + "~" + self.string2 + "~" + self.string3 + "~" + self.string4 + "~" + '\0'
-        self.out = ""
-        #print(tempString)
-        return tempString
+        tempString = "$" + self.string1 + "~" + self.string2 + "~" + self.string3 + "~" + self.string4 + "~" + "\0"
+
+        temp = self.out
+        temp += bytearray(tempString,"latin-1")
+
+        self.out = bytearray()
+
+        self.usingBuzzer = False
+        self.usingLed2 = False
+        self.usingLed1 = False
+        self.usingBar = False
+
+        return temp
 
     def __init__(self,columns=16, lines=2):
         self.lcdColumnSize = columns
         self.lcdLineSize = lines
-        self.out = ""
+        self.out = bytearray()
         self.buttonInput = Button.none

@@ -1,10 +1,10 @@
 from BaseClass import BaseClass
-import unittest
 from icalevents import icalevents
 from datetime import date, timedelta, datetime,tzinfo, timezone
 import TimeConversions
 #This one bellow is only for a single string. Will be adding a proper config file later
 import GoogleScheduleAddress
+import colors
 
 def fillString(stru, newLen):
     for i in range(len(stru), newLen):
@@ -13,7 +13,9 @@ def fillString(stru, newLen):
 
 
 class Schedule(BaseClass):
-    enteringNewEvent = False
+    enteringNewEvent = 0
+    swapInCount = 0
+    currentColor = colors.color["off"]
     #change GoogleScheduleAddress.GoogleAdressString to the public link for your google calendar's .ics file
     url = GoogleScheduleAddress.GoogleAdressString
     start = datetime.now() - timedelta(days=1)
@@ -21,7 +23,6 @@ class Schedule(BaseClass):
     end = start + deltaTime
     evs = icalevents.events(url=url, file=None, start=start, end=end)
     evs.sort()
-    print(str(len(evs)))
 
     def getMainString(self, ev, timeNow,lcdColumnSize):
         tempTime = ev.end.astimezone(self.start.tzinfo) - timeNow.astimezone(self.start.tzinfo)
@@ -49,7 +50,25 @@ class Schedule(BaseClass):
             return True
         return False
 
-    #def eventSwapIn(self):
+    def updateLedWithEventColor(self,ev):
+
+        if not ev.description in colors.color:
+            self.currentColor = colors.color["off"]
+        else:
+            self.currentColor = colors.color[ev.description]
+        self.changeLED2(self.currentColor)
+
+
+    def getCurrentEventColor(self):
+        return self.currentColor
+
+    def swapIn(self):
+        self.swapInCount = 5
+        self.active = True
+
+    def swapInStuff(self):
+        if self.isEventHappening(self.evs[0],datetime.now(self.start.tzinfo)):
+            self.updateLedWithEventColor(self.evs[0])
 
 
     def update(self,input):
@@ -59,18 +78,33 @@ class Schedule(BaseClass):
             string0 = ""
             string1 = "Nada agora " + TimeConversions.convertIntTimeToString2(timeNow.hour, timeNow.minute)
             string2 = ""
-            eventIndex = 0
+            eventIndex = 1
+
+            if self.swapInCount >=0:
+                self.swapInCount -= 1
+            elif self.swapInCount == 0:
+                self.swapInStuff()
+                self.swapInCount -= 1
+
+            if self.enteringNewEvent>0:
+                self.enteringNewEvent -= 1
+                self.updateLedWithEventColor(self.evs[0])
+
             if not len(self.evs) == 0:
                 if timeNow.astimezone(self.start.tzinfo) > self.evs[eventIndex].end.astimezone(self.start.tzinfo):
-                    #self.buzzer(1)
                     self.evs.reverse()
                     self.evs.pop()
                     self.evs.reverse()
-                    self.enteringNewEvent
+                    self.enteringNewEvent = 1
+                    #self.updateLedWithEventColor(self.evs[0])
+
             if not len(self.evs) == 0:
                 if self.isEventHappening(self.evs[eventIndex],timeNow):
                     string1 = self.getMainString(self.evs[eventIndex], timeNow, self.lcdColumnSize)
                     eventIndex += 1
+                    #self.updateLedWithEventColor(self.evs[0])
+                else:
+                    self.changeLED2(colors.color["off"])
 
                 if len(self.evs) > 1:
                     string2 = self.getSecondaryString(self.evs[eventIndex], timeNow, self.lcdColumnSize)
