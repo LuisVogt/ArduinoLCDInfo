@@ -54,7 +54,7 @@ class BaseClass:
         if not self.usingLed2:
             self.usingLed2 = True
             temp = "".encode("latin-1")
-            temp = chr(ord("*")) + color
+            temp = chr(ord("*")) + chr(color[0])+chr(color[1])+chr(color[2])
             self.out += bytearray(temp,"latin-1")
 
     def buzzer(self, time):

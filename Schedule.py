@@ -51,13 +51,14 @@ class Schedule(BaseClass):
         return False
 
     def updateLedWithEventColor(self,ev):
-
         if not ev.description in colors.color:
             self.currentColor = colors.color["off"]
         else:
             self.currentColor = colors.color[ev.description]
         self.changeLED2(self.currentColor)
 
+    def reupdateLed(self):
+        self.changeLED2(self.currentColor)
 
     def getCurrentEventColor(self):
         return self.currentColor
@@ -73,42 +74,46 @@ class Schedule(BaseClass):
 
     def update(self,input):
         # end, start, summary, description
-        if self.active:
-            timeNow = datetime.now(self.start.tzinfo)
-            string0 = ""
-            string1 = "Nada agora " + TimeConversions.convertIntTimeToString2(timeNow.hour, timeNow.minute)
-            string2 = ""
-            eventIndex = 1
+        #if self.active:
+        timeNow = datetime.now(self.start.tzinfo)
+        string1 = "Nada agora " + TimeConversions.convertIntTimeToString2(timeNow.hour, timeNow.minute)
+        string2 = ""
+        eventIndex = 0
 
-            if self.swapInCount >=0:
-                self.swapInCount -= 1
-            elif self.swapInCount == 0:
-                self.swapInStuff()
-                self.swapInCount -= 1
 
-            if self.enteringNewEvent>0:
-                self.enteringNewEvent -= 1
-                self.updateLedWithEventColor(self.evs[0])
+        if self.swapInCount >=0:
+            self.swapInCount -= 1
+        elif self.swapInCount == 0:
+            self.swapInStuff()
+            self.swapInCount -= 1
 
-            if not len(self.evs) == 0:
-                if timeNow.astimezone(self.start.tzinfo) > self.evs[eventIndex].end.astimezone(self.start.tzinfo):
-                    self.evs.reverse()
-                    self.evs.pop()
-                    self.evs.reverse()
-                    self.enteringNewEvent = 1
-                    #self.updateLedWithEventColor(self.evs[0])
+        if self.enteringNewEvent>0:
+            self.enteringNewEvent -= 1
+            self.updateLedWithEventColor(self.evs[0])
 
-            if not len(self.evs) == 0:
-                if self.isEventHappening(self.evs[eventIndex],timeNow):
-                    string1 = self.getMainString(self.evs[eventIndex], timeNow, self.lcdColumnSize)
-                    eventIndex += 1
-                    #self.updateLedWithEventColor(self.evs[0])
-                else:
-                    self.changeLED2(colors.color["off"])
 
-                if len(self.evs) > 1:
-                    string2 = self.getSecondaryString(self.evs[eventIndex], timeNow, self.lcdColumnSize)
-            self.updateOut(string1, string2, "", "")
+
+        if not len(self.evs) == 0:
+            if timeNow.astimezone(self.start.tzinfo) > self.evs[eventIndex].end.astimezone(self.start.tzinfo):
+                self.evs.reverse()
+                self.evs.pop()
+                self.evs.reverse()
+                self.enteringNewEvent = 1
+
+        if not len(self.evs) == 0:
+            if self.isEventHappening(self.evs[eventIndex],timeNow):
+                string1 = self.getMainString(self.evs[eventIndex], timeNow, self.lcdColumnSize)
+                eventIndex += 1
+                self.updateLedWithEventColor(self.evs[eventIndex])
+                #self.reupdateLed()
+
+                #self.updateLedWithEventColor(self.evs[0])
+            else:
+                self.changeLED2(colors.color["off"])
+
+            if len(self.evs) > 1:
+                string2 = self.getSecondaryString(self.evs[eventIndex], timeNow, self.lcdColumnSize)
+        self.updateOut(string1, string2, "", "")
 
 
 
